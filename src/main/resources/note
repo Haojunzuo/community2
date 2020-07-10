@@ -1,0 +1,107 @@
+模拟post请求，尝试一个新东西的时候要去官网学习。
+通过码匠社区调用authorize接口到github，github跳转回我们的网址，并返回code
+通过okhttp调用github的access_token接口并且携带code，拿到access_token后，
+再次调用user接口，返回user信息。
+把文档拷贝过来，放到我们项目里取用，不要磕到一个地方的时候就死磕。
+
+method="post"对应的是PostMapping注解，method="get"对应的是GetMapping注解,这一点需要注意，以前遇到的不能使用get请求的问题可能就是这个原因。
+java.net.SocketException: Connection reset出现这个错误的原因：服务器和客户端一端退出，但退出时并未关闭该连接，另一端如果在从连接中读数据则抛出该异常（Connection reset）。简单的说就是在连接断开后的读和写操作引起的。
+
+使用数据库的定时事件：
+使用该语句：show variables like 'event_scheduler';查看数据库是否支持event。
+1，首先在函数中创建一个存储过程，在存储过程中的begin和end之间写入要执行的sql语句。
+2，然后创建一个event事件，在该事件中调用存储过程使用：do ，需要在计划中设置定时规则，还可以通过sql预览，查看该事件代码，在定义中改变状态可以开启或关闭该事件。
+3，数据库定时事件完成。
+
+之前没有接触过对于数据库的datetime类型数据的计算，这次学习并使用了datetime类型数据。
+1，使用datediff函数：
+delete from demo1 where DATEDIFF(NOW(),date)>7;删除表中距离当前日期大于一周的数据。
+select datediff(now(),date) as datenum from demo1;查询表所有date列中距离当前日期的天数，并以datenum为列名表示出来。
+2，使用timestampdiff函数：
+select timestampdiff(unit,datetime_expr1,datetime_expr2) from ...
+示例：select timestampdiff(second,now(),date) from demo1;
+
+HTML使用代码组件的方式，提高代码的复用率（thymeleaf实现）：
+1，使用代码组件可以减少重复代码，例如在可以将导航栏设置成为一个组件，其他页面引入这个组件即可。
+2，有利于代码的维护，当需要修改时，只需修改一个页面即可。
+使用方法：
+1，将重复代码设置为一个独立的HTML页面，命名可随意，这里命名为navigation.html，在该页面上同样要有HTML页面的基本元素，同时在body里面设置一个div元素: <div th:fragment="nav">这个div包裹组件代码
+2，在需要引入该组件的HTML页面使用<div th:insert="~{navigation::nav}"></div>即可
+
+
+thymeleaf的用法的总结：
+1，首先在html标签里使用如下：<html lang="en" xmlns:th="http://www.thymeleaf.org">
+2，thymeleaf 的th:text的使用:示例：<span th:text="${sectionName}}">,作用是显示文本
+3，thymeleaf 的th:each的使用：示例：<div th:each="question:${questions}}">这里的question为questions中的每一个元素，之后可以对question进行操作，达到遍历questions的目的。
+4，thymeleaf 的th:src的使用： 使用和th:text使用方式一致，可以在img等元素上使用   这里属于thymeleaf为元素增加属性以及赋值
+5，thymeleaf 的格式化时间的使用：<span th:text="${#dates.format(question.gmtcreate,'yyy-MM-dd HH:mm')}"></span>   使用"${#dates.format(question.gmtcreate,'yyy-MM-dd HH:mm')}"的方式
+6，thymeleaf 的超链接的使用：<a th:href="@{/(page=${pagination.page - 1})}">这种方式是URL表达式，是推荐写法，简单好看，可读性高,括号左边的为路由地址，后面为参数，如果多个参数可用','隔开
+    <a th:href="@{'/?page='+${pagination.page-1}}">  这种方式是URL表达式+拼接字符串，可读性不强，不建议
+    <a th:href="${'/?page='}+${pagination.page-1}">  这种方式是使用变量表达式。
+7，thymeleaf 的if的使用：<li th:if="${session.user!=null}">      th:if="${判断条件}}"
+8，thymeleaf 的switch case的使用： 父标签使用switch 子标签使用case 来判断是否执行或显示
+其他的thymeleaf的应用：th:id    th:unless(和th:if相反)   th:value  th:onclick   th:action
+
+
+controller层的函数使用参数的方法：
+1，@RequestParam(name = "page",defaultValue = "1") int page, 可设置默认值，可以是前端传过来的值。
+2，直接写类型和值，   public int update(String result,String finalresult,int pid)  前端有name同名的input元素，直接将值传到后端。
+3，直接使用实体类对象作为参数  public String insert(Patient p, HttpSession session)，前端的form表单中的各input的name都为实体类的属性。
+4，使用包含实体类的集合类，public String createCheckItemRecord(CheckItemRecordList cirList)，前端使用的时候需要使用 cirList[0].id , cirList[0].name,cirList[1].id,  cirList[1].name这样的方式作为name
+5，可以在填写路由路径，然后在函数中取到该路径上的值：@GetMapping("/profile/{action}")
+                                                public String profile(@PathVariable(name = "action") String action,
+                                                前端为<a href="/profile/questions">,然后就能得到 action的值为questions
+
+@GetMapping和@PostMapping分别用于将HTTP get和HTTP post请求映射到特定处理程序的方法注解 前者是：@RequestMapping(method=RequestMethod.GET)的缩写 后者是：@RequestMapping(method=RequestMethod.POST)的缩写
+@ResponseBody   @ResponseBody是作用在方法上的，@ResponseBody 表示该方法的返回结果直接写入 HTTP response body 中，一般在ajax中使用，并且在使用了@ResponseBody之后，@RequestMapping往往不会被解析为跳转路径。
+直接将返回的结果写入到HTTP response body中
+方法的跳转路径为重定向：return "redirect:/"; 直接跳转到根路径。 springboot支持html页面不用写前后缀，也就是直接写html页面的名字就好  return "login";
+路径中"/"的作用：在路径的最前面使用"/"指的是根路径下的，比如<script type="text/javascript" src="/js/jquery-3.2.1.min.js"  ></script>  指的是webapp下的资源。
+如果路由路径发生变化，那么在不加"/"的情况下，就不能加载到资源，因此在静态资源，以及注解中的路径 都要使用"/"来表示是根路径。
+
+重定向和转发：
+重定向：request.sendRedirect()方法，不仅可以重定向到当前应用程序的其他资源，也能定向到同一个站点其他应用程序的资源，
+转发：request.getRequestDispatcher().forward()  只能请求转发给同一个web应用中的组件。
+区别：重定向后地址栏会发生改变，而转发就不用改变，重定向时，浏览器一共发出了两封信和收到两次回复，转发的时候，浏览器一共发出了一封信，收到一次回复。转发是服务器行为，重定向是客户端行为
+
+对于注解的mybatis，方法的参数名，可以直接写SQL语句要用到的列的名称，在定义数据库表的时候，应尽量保持简易，并且和实体类的属性名称保持一致。
+使用mybatis的时候应尽量使用xml方式，这种方式更加简便。
+
+对于拦截器的总结：
+1，首先需要定义一个拦截器：实现HandlerInterceptor的接口，或者继承HandlerInterceptorAdatper类
+2，需要重写preHandle方法，postHandle和afterCompletion方法可以不重写，preHandle是controller调用拦截的路径之前执行，postHandle在controller调用拦截的路径之后执行，
+afterCompletion在整个请求结束之后执行，只有preHandle在返回true的时候，才会执行controller和下面的内容，如果返回false直接终止。
+3，注册拦截器：可以新写一个类，也可以在springboot的启动类中注册拦截器。需要实现WebMvcConfigurer接口，在类上使用@configuration注解
+4，重写注册拦截器中类的方法：addInterceptors：   InterceptorRegistration  ir = registry.addInterceptor(myInterceptor);  ir.addPathPatterns("/**"); ir.excludePathPatterns("/user/info");
+    可以注册多个拦截器。在启动类中注册也是一样的。
+拦截器的本质是面向切面编程（AOP），符合横切关注点的功能都可以在拦截器中实现。
+
+url（uniform resource locator）
+url是前后端之间的访问路径，文件路径是本机的文件路径，前者是全世界的，是网址，后者是本机的。
+url称为网址 标准格式：  协议类型:[//服务器地址[:端口号]][/资源层级UNIX文件路径]文件名?查询
+绝对url：绝对URL（absolute URL）显示文件的完整路径，这意味着绝对URL本身所在的位置与被引用的实际文件的位置无关。
+相对URL（relative URL）以包含URL本身的文件夹的位置为参考点，描述目标文件夹的位置。 ./目前所在路径   ../上一层路径   /根路径
+
+href（Hypertext Reference）指定网络资源的位置，从而在当前元素或者当前文档和由当前属性定义的需要的锚点或资源之间定义一个链接或者关系，（定义一个链接关系）
+href不是为了引用资源，而是为了建立联系，是当前标签能够链接到目标地址。
+src（source）指向外部的资源，指向的内容将会应用到文档中当前标签所在的位置。
+href 和 src 之间的区别，  href指向的是网络资源所在的位置，建立和当前元素或当前文档之间的关系。src是将其指向的资源下载并应用到文档中。
+
+session和cookie
+两者都是用来跟踪用户的会话。cookie通过在客户端记录信息确定用户身份，session通过在服务器记录信息确定用户身份，增加了服务器的压力。
+cookie给客户端颁发一个通行证，访问的时候带着自己的通行证，服务器就能确定客户的身份了。
+session客户端浏览器在访问服务器的时候，服务器会将客户端的信息以某种形式记录在服务器上，这就是session 客户端再访问的时候，只需要在session中查找客户的状态就行。
+
+
+设置session的方法  request.getSession.setAttribute("user",user);
+清除session的方法  request.getSession.removeAttribute("user");
+设置cookie的方法   response.addCookie(new Cookie("token",token));
+删除cookie的方法   Cookie cookie = new Cookie("token",null); cookie.setMaxAge(0);  response.addCookie(cookie);
+
+community项目的项目编程思想：
+1，各个组件之间分工明确，Authorize  Index  Profile  Publish
+2，为不同的组件设置不同的包：entity    interceptor  provider  dto
+3，使用了dto这个概念，dto（data transfer object）数据传输对象，是一种设计模式之间传输数据的软件应用系统，他和entity不一样，entity直接对应的是数据库的表，
+而dto则不止对应了数据库的表，还有其他的元素。可以称其为数据的载体，是一个实体类，起到传输数据的作用。
+4，广泛的使用判断，根据不同的条件，执行不同的语句。例如在登录的时候，会检查数据库中有无数据，然后再决定对数据进行插入或者更新。
+5，不使用超前开发的理念，用到什么东西，就去查询，设计什么东西，从来不做不必要做的事。
