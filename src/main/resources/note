@@ -105,3 +105,26 @@ community项目的项目编程思想：
 而dto则不止对应了数据库的表，还有其他的元素。可以称其为数据的载体，是一个实体类，起到传输数据的作用。
 4，广泛的使用判断，根据不同的条件，执行不同的语句。例如在登录的时候，会检查数据库中有无数据，然后再决定对数据进行插入或者更新。
 5，不使用超前开发的理念，用到什么东西，就去查询，设计什么东西，从来不做不必要做的事。
+
+
+$ git remote add origin https://github.com/HaoJunzuo/community2.git
+$ git push -u origin master
+$ git push origin master
+
+
+mybatisgenerator
+
+
+mvn -Dmybatis.generator.overwrite=true mybatis-generator:generate
+
+当引入类出错时，可以重新生成该类，再次引入。
+
+使用maven命令自动生成mybatis generator时，出现生成其他数据库的同名的表的时候在 jdbcconnection中添加
+<property name="serverTimezone" value="UTC"/>
+<property name="nullCatalogMeansCurrent" value="true"/>
+在table标签里添加schema属性，schema为数据库名称。
+
+运行maven命令，在右侧的maven窗口中，点击execute maven goal即可。
+
+Failed to parse mapping resource
+此错误是mapper的映射错误，没有找到.java 文件。

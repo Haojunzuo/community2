@@ -1,6 +1,6 @@
 package com.cjh.community2.dto;
 
-import com.cjh.community2.entity.User;
+import com.cjh.community2.model.User;
 import lombok.Data;
 
 @Data

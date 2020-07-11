@@ -2,30 +2,24 @@ package com.cjh.community2.controller;
 
 import com.cjh.community2.dto.AccessTokenDTO;
 import com.cjh.community2.dto.GithubUser;
-import com.cjh.community2.entity.User;
-import com.cjh.community2.mapper.UserMapper;
+import com.cjh.community2.model.User;
 import com.cjh.community2.provider.GithubProvider;
 import com.cjh.community2.service.UserService;
-import com.sun.org.apache.regexp.internal.RE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
 import java.util.UUID;
 
 @Controller
 public class AuthorizeController {
     @Autowired
     private GithubProvider githubProvider;
-    @Resource
-    private UserMapper userMapper;
     @Autowired
     private UserService userService;
     @Value("${github.client.id}")
@@ -51,12 +45,11 @@ public class AuthorizeController {
             String token = UUID.randomUUID().toString();
             user.setToken(token);
             user.setName(githubUser.getName());
-            user.setAccountId(String.valueOf(githubUser.getId()));
-            user.setGmtCreate(System.currentTimeMillis());
-            user.setGmtModified(user.getGmtCreate());
+            user.setAccountid(String.valueOf(githubUser.getId()));
+            user.setGmtcreate(System.currentTimeMillis());
+            user.setGmtmodified(user.getGmtcreate());
             user.setAvatar_url(githubUser.getAvatar_url());
             userService.createOrUpdate(user);
-//            userMapper.insert(user);
             response.addCookie(new Cookie("token", token));
             return "redirect:/";
         } else {
