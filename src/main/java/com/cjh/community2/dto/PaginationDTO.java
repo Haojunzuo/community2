@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 //分页操作的页码信息管理
+//PaginationDTO类是一个用来进行分页的数据传输对象，里面包括一个List存放泛型，还有关于页面是否有上下页，是否有第一最后一页，当前页面上的显示的页码等信息，时候用model传输到
+//HTML页面上的就是PaginationDTO对象。
 @Data
-public class PaginationDTO {
-    private List<QuestionDTO> questions;
+public class PaginationDTO<T> {
+    private List<T> data;
     //是否有向前按钮
     private boolean showPrevious;
     //第一页按钮

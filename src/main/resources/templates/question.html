@@ -74,7 +74,7 @@
                                 <span class="glyphicon glyphicon-thumbs-up icon"></span>
                                 <span th:data-id="${comment.id}"
                                       onclick="collapseComments(this)" class="comment-icon">
-                                    <span class="glyphicon glyphicon-comment"></span>
+                                    <span class="glyphicon glyphicon-comment" th:text="${comment.commentcount}"></span>
 <!--                                    <span th:text="${comment.commentCount}"></span>-->
                                 </span>
                                 <span class="pull-right"

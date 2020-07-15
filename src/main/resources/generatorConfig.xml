@@ -41,6 +41,9 @@
         <table schema="community2" tableName="comment" domainObjectName="Comment" >
             <property name="useActualColumnNames" value="true"/>
         </table>
+        <table schema="community2" tableName="notification" domainObjectName="Notification" >
+            <property name="useActualColumnNames" value="true"/>
+        </table>
 
     </context>
 </generatorConfiguration>

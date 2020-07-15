@@ -19,13 +19,19 @@ public class QuestionController {
     private QuestionService questionService;
     @Autowired
     private CommentService commentService;
+
+    /*
+    *     /question/id   对应的方法位于QuestionController，这个方法向HTML页面传输questionDTO，commentDTOS，relatedQuestions三个对象。分别代表问题，评论和相关问题。并且每次成功执行该函数后就会将该问题
+    * 的阅读数加1
+    * */
     @GetMapping("/question/{id}")
     public String question(@PathVariable(name = "id") Long id,
                            Model model){
         QuestionDTO questionDTO = questionService.getById(id);
         List<QuestionDTO> relatedQuestions = questionService.selectRelated(questionDTO);
-        System.out.println(relatedQuestions.get(0));
-        System.out.println(relatedQuestions.get(0).getTag());
+//      验证相关问题的查询是否成功，是否有内容，验证相关问题的tag是否存在。
+//        System.out.println(relatedQuestions.get(0));
+//        System.out.println(relatedQuestions.get(0).getTag());
         questionService.incView(id);
         List<CommentDTO> commentDTOS = commentService.listByTargetId(id, CommentTypeEnum.QUESTION);
         model.addAttribute("question",questionDTO);
