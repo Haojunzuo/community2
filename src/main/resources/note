@@ -128,3 +128,29 @@ mvn -Dmybatis.generator.overwrite=true mybatis-generator:generate
 
 Failed to parse mapping resource
 此错误是mapper的映射错误，没有找到.java 文件。
+
+ctrl+alt+v   抽出一个变量
+ctrl+alt+p   抽出一个参数
+ctrl+alt+m   抽出一个方法
+
+ctrl+f6     改变参数类型或名称
+shift+f6    改变函数名字，并将依赖自动改掉，这是一种重构
+
+th:data-id
+
+shif+f6 批量修改
+ctrl+shift+n查询文件
+
+
+
+value.IndexOf(',')==-1
+看看value是不是包含‘,’字符，
+不包含则返回-1，包含则返回这个字符出现的位置，
+记得是0开始索引的
+
+.show()如果被选元素已被隐藏，则显示这些元素，如果该元素是显示元素，则无任何效果
+
+
+修改js和css文件之后，如果不能在页面生效很大程度上是因为浏览器没有开启network下的disable cache，不禁止缓存，页面将会使用以前的内容，这是一个低级错误，以后不要再犯。
+
+idea编译的快捷键，ctrl+f9  此快捷键可以用于项目静态资源改变不需要重启，但是不增加其他的配置的时候，需要编译一下才会起作用，这个时间要远远小于重启，是可以使用的。

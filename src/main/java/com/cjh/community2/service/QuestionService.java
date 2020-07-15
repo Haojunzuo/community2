@@ -14,9 +14,13 @@ import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 //import com.cjh.community2.mapper.*;
 
@@ -53,7 +57,9 @@ public class QuestionService {
 
         paginationDTO.setPagination(totalPage, page);
         int offset = size * (page - 1);
-        List<Question> questions = questionMapper.selectByExampleWithRowbounds(new QuestionExample(),new RowBounds(offset,size));
+        QuestionExample example = new QuestionExample();
+        example.setOrderByClause("gmtcreate desc");
+        List<Question> questions = questionMapper.selectByExampleWithRowbounds(example,new RowBounds(offset,size));
         List<QuestionDTO> questionDTOList = new ArrayList<>();
 
         for (Question question : questions) {
@@ -67,7 +73,7 @@ public class QuestionService {
         return paginationDTO;
     }
 
-    public PaginationDTO list(Integer userId, int page, int size) {
+    public PaginationDTO list(Long userId, int page, int size) {
 
         PaginationDTO paginationDTO = new PaginationDTO();
         Integer totalPage;
@@ -110,7 +116,7 @@ public class QuestionService {
         return paginationDTO;
     }
 
-    public QuestionDTO getById(Integer id) {
+    public QuestionDTO getById(Long id) {
         Question question = questionMapper.selectByPrimaryKey(id);
         if (question == null) {
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
@@ -126,6 +132,9 @@ public class QuestionService {
         if(question.getId()==null){
             question.setGmtcreate(System.currentTimeMillis());
             question.setGmtmodified(question.getGmtcreate());
+            question.setViewcount(0);
+            question.setCommentcount(0);
+            question.setLikecount(0);
             questionMapper.insert(question);
         }else {
             Question updateQuestion = new Question();
@@ -139,15 +148,34 @@ public class QuestionService {
                     .andIdEqualTo(question.getId());
             int i = questionMapper.updateByExampleSelective(updateQuestion, example);
             if (i != 1) {//这样导致会出现很多这样的代码。
-                throw new CustomizeException("没有更新");
+                throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
             }
         }
     }
 
-    public void incView(Integer id) {
+    public void incView(Long id) {
         Question question = new Question();
         question.setId(id);
         question.setViewcount(1);
         questionExtMapper.incView(question);
+    }
+
+    public List<QuestionDTO> selectRelated(QuestionDTO queryDTO) {
+        if (StringUtils.isEmpty(queryDTO.getTag())){
+            return new ArrayList<>();
+        }
+        String[] tags = StringUtils.split(queryDTO.getTag(), ",");
+//        System.out.println(tags[1]);
+        String regexpTag = Arrays.stream(tags).collect(Collectors.joining("|"));
+        Question question = new Question();
+        question.setId(queryDTO.getId());
+        question.setTag(regexpTag);
+        List<Question> questions = questionExtMapper.selectRelated(question);
+        List<QuestionDTO> questionDTOS = questions.stream().map(q -> {
+            QuestionDTO questionDTO = new QuestionDTO();
+            BeanUtils.copyProperties(q,questionDTO);
+            return questionDTO;
+        }).collect(Collectors.toList());
+        return questionDTOS;
     }
 }

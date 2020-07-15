@@ -1,34 +1,36 @@
 
-//提交回复
+/**
+ * 提交回复
+ */
 function post() {
     var questionId = $("#question_id").val();
     var content = $("#comment_content").val();
-    comment2target(questionId,1,content);
+    comment2target(questionId, 1, content);
 }
 
-function comment2target(targerId,type,content){
-    if (!content){
+function comment2target(targetId, type, content) {
+    if (!content) {
         alert("不能回复空内容~~~");
         return;
     }
+
     $.ajax({
         type: "POST",
         url: "/comment",
         contentType: 'application/json',
         data: JSON.stringify({
-            "parentId": targerId,
+            "parentid": targetId,
             "content": content,
             "type": type
         }),
         success: function (response) {
             if (response.code == 200) {
-                /*$("#comment_section").hide();*/
                 window.location.reload();
             } else {
                 if (response.code == 2003) {
                     var isAccepted = confirm(response.message);
                     if (isAccepted) {
-                        window.open("https://github.com/login/oauth/authorize?client_id=69e311bad26e3f579725&redirect_uri=http://localhost:8887/callback&scope=user&state=1");
+                        window.open("https://github.com/login/oauth/authorize?client_id=2b71ea41ef3a2734aa55&redirect_uri=http://localhost:8084/callback&scope=user&state=1");
                         window.localStorage.setItem("closable", true);
                     }
                 } else {
@@ -75,7 +77,7 @@ function collapseComments(e) {
                         "class": "media-left"
                     }).append($("<img/>", {
                         "class": "media-object img-rounded",
-                        "src": comment.user.avatarUrl
+                        "src": comment.user.avatar_url
                     }));
 
                     var mediaBodyElement = $("<div/>", {
@@ -89,7 +91,7 @@ function collapseComments(e) {
                         "class": "menu"
                     }).append($("<span/>", {
                         "class": "pull-right",
-                        "html": moment(comment.gmtCreate).format('YYYY-MM-DD')
+                        "html": moment(comment.gmtcreate).format('YYYY-MM-DD')
                     })));
 
                     var mediaElement = $("<div/>", {
@@ -119,9 +121,9 @@ function showSelectTag() {
 function selectTag(e) {
     var value = e.getAttribute("data-tag");
     var previous = $("#tag").val();
-    if (previous.indexOf(value) == 1){
-        if (previous){
-            $("#tag").val(previous + "," + value);
+    if (previous.indexOf(value) == -1) {
+        if (previous) {
+            $("#tag").val(previous + ',' + value);
         } else {
             $("#tag").val(value);
         }
