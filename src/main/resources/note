@@ -164,3 +164,10 @@ Objects.equals方法
 
 当实体类中没有这个属性，而在HTML上用thymeleaf取该对象的属性的时候 就会报模板解析错误。
 
+ctrl+alt+左箭头  返回上一个光标的地方。
+ctrl+d  复制一行
+ctrl+y  删除一行
+
+@ResponseBody的作用，将json转换为字符串返回到controller ，将对象转换为json返回到前端。
+
+ctrl+alt+o  删除无用的依赖
